@@ -1,5 +1,9 @@
 # Changes
 
+## 1.0.1
+
+- The time limits of the hostile-input tests are four times wider when the tests run with coverage, which slows every line of the tool; a plain test run keeps the tight limits. The tool itself is unchanged.
+
 ## 1.0.0
 
 First release.

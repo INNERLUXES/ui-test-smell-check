@@ -12,10 +12,15 @@ import { PW, analyse, find, run, where, withFiles } from './helpers.js';
 // process.platform, and none of them asserts a line or a column: those are asserted in the tests that run everywhere.
 
 const LIMIT = { timeout: 60000 };
+// Coverage counting slows every line of the tool several times over, so a run with --experimental-test-coverage gets a
+// wider time limit. A plain `npm test` keeps the tight one, and that is the run that guards against slow growth.
+// The runner sets NODE_V8_COVERAGE for its test processes only when coverage is on.
+const COVERAGE = Boolean(process.env.NODE_V8_COVERAGE);
 const fast = async (fn, ms = 5000) => {
+  const limit = COVERAGE ? ms * 4 : ms;
   const start = Date.now();
   const result = await fn();
-  assert.ok(Date.now() - start < ms, `took ${Date.now() - start} ms`);
+  assert.ok(Date.now() - start < limit, `took ${Date.now() - start} ms`);
   return result;
 };
 const quiet = { out: () => {}, err: () => {} };

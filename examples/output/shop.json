@@ -1,6 +1,6 @@
 {
   "tool": "ui-test-smell-check",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "inputs": [
     "examples/shop"
   ],
