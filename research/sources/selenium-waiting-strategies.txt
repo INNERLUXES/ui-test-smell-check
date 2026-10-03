@@ -1,0 +1,65 @@
+Source: https://www.selenium.dev/documentation/webdriver/waits/
+
+# Waiting Strategies
+
+Perhaps the most common challenge for browser automation is ensuring
+that the web application is in a state to execute a particular
+Selenium command as desired. The processes often end up in
+a race condition where sometimes the browser gets into the right
+state first (things work as intended) and sometimes the Selenium code
+executes first (things do not work as intended). This is one of the
+primary causes of flaky tests.
+
+All navigation commands wait for a specific readyState value
+based on the page load strategy (the
+default value to wait for is "complete") before the driver returns control to the code.
+The readyState only concerns itself with loading assets defined in the HTML,
+but loaded JavaScript assets often result in changes to the site,
+and elements that need to be interacted with may not yet be on the page
+when the code is ready to execute the next Selenium command.
+
+Similarly, in a lot of single page applications, elements get dynamically
+added to a page or change visibility based on a click.
+An element must be both present and
+displayed on the page
+in order for Selenium to interact with it.
+
+Take this page for example: https://www.selenium.dev/selenium/web/dynamic.html
+When the "Add a box!" button is clicked, a "div" element that does not exist is created.
+When the "Reveal a new input" button is clicked, a hidden text field element is displayed.
+In both cases the transition takes a couple seconds.
+If the Selenium code is to click one of these buttons and interact with the resulting element,
+it will do so before that element is ready and fail.
+
+The first solution many people turn to is adding a sleep statement to
+pause the code execution for a set period of time. Because the code can't know exactly how long it needs to wait, this
+can fail when it doesn't sleep long enough.
+
+Selenium provides two different mechanisms for synchronization that are better.
+
+## Implicit waits
+
+Selenium has a built-in way to automatically wait for elements called an implicit wait.
+An implicit wait value can be set either with the timeouts
+capability in the browser options, or with a driver method (as shown below).
+
+The default value is 0, which means that if the element is not found, it will
+immediately return an error. If an implicit wait is set, the driver will wait for the
+duration of the provided value before returning the error.
+
+Warning:
+Do not mix implicit and explicit waits.
+Doing so can cause unpredictable wait times.
+For example, setting an implicit wait of 10 seconds
+and an explicit wait of 15 seconds
+could cause a timeout to occur after 20 seconds.
+
+## Explicit waits
+
+Explicit waits are loops added to the code that poll the application
+for a specific condition to evaluate as true before it exits the loop and
+continues to the next command in the code. If the condition is not met before a designated timeout value,
+the code will give a timeout error. Since there are many ways for the application not to be in the desired state,
+explicit waits are a great choice to specify the exact condition to wait for
+in each place it is needed.
+Another nice feature is that, by default, the Selenium Wait class automatically waits for the designated element to exist.

@@ -1,0 +1,240 @@
+Source: https://docs.cypress.io/app/core-concepts/best-practices
+
+## Selecting Elements
+
+danger
+
+ Anti-Pattern: Using highly
+brittle selectors that are subject to change.
+
+tip
+
+ Best Practice: Use data-*
+attributes to provide context to your selectors and isolate them from CSS or JS
+changes.
+
+Every test you write will include selectors for elements. To save yourself a lot
+of headaches, you should write selectors that are resilient to changes.
+
+Oftentimes we see users run into problems targeting their elements because:
+
+- Your application may use dynamic classes or ID's that change
+
+- Your selectors break from development changes to CSS styles or JS behavior
+
+Luckily, it is possible to avoid both of these problems.
+
+- Don't target elements based on CSS attributes such as: id, class, tag
+
+- Don't target elements that may change their textContent
+
+- Add data-* attributes to make it easier to target elements
+
+The cypress/require-data-selectors
+rule in eslint-plugin-cypress can
+enforce data-* selectors automatically at lint time.
+
+### How It Works
+
+Given a button that we want to interact with:
+
+<button
+
+  id="main"
+
+  class="btn btn-large"
+
+  name="submission"
+
+  role="button"
+
+  data-cy="submit"
+
+>
+
+  Submit
+
+</button>
+
+Let's investigate how we could target it:
+
+Selector | Recommended | Notes |
+
+cy.get('button').click() |  Never | Worst - too generic, no context. |
+
+cy.get('.btn.btn-large').click() |  Never | Bad. Coupled to styling. Highly subject to change. |
+
+cy.get('#main').click() |  Sparingly | Better. But still coupled to styling or JS event listeners. |
+
+cy.get('[name="submission"]').click() |  Sparingly | Coupled to the name attribute which has HTML semantics. |
+
+cy.contains('Submit').click() |  Depends | Much better. But still coupled to text content that may change. |
+
+cy.get('[data-cy="submit"]').click() |  Always | Best. Isolated from all changes. |
+
+Targeting the element above by tag, class or id is very volatile and
+highly subject to change. You may swap out the element, you may refactor CSS and
+update ID's, or you may add or remove classes that affect the style of the
+element.
+
+Instead, adding the data-cy attribute to the element gives us a targeted
+selector that's only used for testing.
+
+The data-cy attribute will not change from CSS style or JS behavioral changes,
+meaning it's not coupled to the behavior or styling of an element.
+
+Additionally, it makes it clear to everyone that this element is used directly
+by test code.
+
+## Having Tests Rely On The State Of Previous Tests
+
+danger
+
+ Anti-Pattern: Coupling
+multiple tests together.
+
+tip
+
+ Best Practice: Tests should
+always be able to be run independently from one another and still pass.
+
+You only need to do one thing to know whether you've coupled your tests
+incorrectly, or if one test is relying on the state of a previous one.
+
+Change it to it.only
+on the test and refresh the browser.
+
+If this test can run by itself and pass - congratulations you have written a
+good test.
+
+If this is not the case, then you should refactor and change your approach.
+
+How to solve this:
+
+- Move repeated code in previous tests to before or beforeEach hooks.
+
+- Combine multiple tests into one larger test.
+
+Let's imagine the following test that is filling out the form.
+
+What's wrong with the above tests? They are all coupled together!
+
+If you were to change it to
+it.only on any of the
+last three tests, they would fail. Each test requires the previous to run in a
+specific order to pass.
+
+Here's 2 ways we can fix this:
+
+## Unnecessary Waiting
+
+danger
+
+ Anti-Pattern: Waiting for
+arbitrary time periods using cy.wait(Number).
+
+tip
+
+ Best Practice: Use route aliases
+or assertions to guard Cypress from proceeding until an explicit condition is
+met.
+
+In Cypress, you almost never need to use cy.wait() for an arbitrary amount of
+time. If you are finding yourself doing this, there is likely a much simpler
+way. The cypress/no-unnecessary-waiting
+rule in eslint-plugin-cypress flags
+cy.wait(<number>) at lint time, before tests ever run.
+
+Let's imagine the following examples:
+
+### Unnecessary wait for cy.request()
+
+Waiting here is unnecessary since the cy.request()
+command will not resolve until it receives a response from your server. Adding
+the wait here only adds 5 seconds after the
+cy.request() has already resolved.
+
+cy.request('http://localhost:8080/db/seed')
+
+cy.wait(5000) // <--- this is unnecessary
+
+### Unnecessary wait for cy.visit() End-to-End Only
+
+Waiting for this is unnecessary because the cy.visit()
+resolves once the page fires its load event. By that time all of your assets
+have been loaded including javascript, stylesheets, and html.
+
+cy.visit('http://localhost/8080')
+
+cy.wait(5000) // <--- this is unnecessary
+
+### Unnecessary wait for cy.get()
+
+Waiting for the cy.get() below is unnecessary because
+cy.get() automatically retries until the table's tr has
+a length of 2.
+
+Whenever commands have an assertion they will not resolve until their associated
+assertions pass. This enables you to describe the state of your application
+without having to worry about when it gets there.
+
+cy.intercept('GET', '/users', [{ name: 'Maggy' }, { name: 'Joan' }])
+
+cy.get('#fetch').click()
+
+cy.wait(4000) // <--- this is unnecessary
+
+cy.get('table tr').should('have.length', 2)
+
+Alternatively a better solution to this problem is by waiting explicitly for an
+aliased route.
+
+cy.intercept('GET', '/users', [{ name: 'Maggy' }, { name: 'Joan' }]).as(
+
+  'getUsers'
+
+)
+
+cy.get('[data-testid="fetch-users"]').click()
+
+cy.wait('@getUsers') // <--- wait explicitly for this route to finish
+
+cy.get('table tr').should('have.length', 2)
+
+## Running Tests Intelligently
+
+## Setting a Global baseUrl
+
+danger
+
+ Anti-Pattern: Using
+cy.visit() without setting a baseUrl.
+
+tip
+
+ Best Practice: Set a baseUrl in
+your Cypress configuration.
+
+By adding a baseUrl in your
+configuration Cypress will attempt to prefix the baseUrl any URL provided to
+commands like cy.visit() and
+cy.request() that are not fully qualified domain name
+(FQDN) URLs.
+
+This removes the need to hard-code fully qualified domain name (FQDN) URLs in
+commands. For example,
+
+cy.visit('http://localhost:8080/index.html')
+
+can be shortened to
+
+cy.visit('index.html')
+
+Not only does this create tests that can easily switch between domains, i.e.
+running a dev server on http://localhost:8080 vs a deployed production server
+domain, but adding a baseUrl can also save some time during the initial
+startup of your Cypress tests.
+
+When you start running your tests, Cypress does not know the url of the app you
+plan to test. So, Cypress initially opens on https://localhost + a random
+port.

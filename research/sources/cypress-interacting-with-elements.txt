@@ -1,0 +1,83 @@
+Source: https://docs.cypress.io/app/core-concepts/interacting-with-elements
+
+## Actionability
+
+Some commands in Cypress are for interacting with the DOM such as:
+
+- .click()
+
+- .dblclick()
+
+- .rightclick()
+
+- .type()
+
+- .clear()
+
+- .check()
+
+- .uncheck()
+
+- .select()
+
+- .trigger()
+
+- .selectFile()
+
+We call these "action commands." These actions simulate a user interacting with
+your application. Under the hood, Cypress fires the events a browser would fire
+thus causing your application's event bindings to fire.
+
+## Forcing
+
+While the above checks are super helpful at finding situations that would
+prevent your users from interacting with elements - sometimes they can get in
+the way!
+
+Sometimes it's not worth trying to "act like a user" to get a robot to do the
+exact steps a user would to interact with an element.
+
+Imagine you have a nested navigation structure where the user must hover over
+and move the mouse in a very specific pattern to reach the desired link.
+
+Is this worth trying to replicate when you're testing?
+
+Maybe not! For these scenarios, we give you an escape hatch to bypass all of the
+checks above and force events to happen!
+
+You can pass { force: true } to most action commands.
+
+// force the click and all subsequent events
+
+// to fire even if this element isn't considered 'actionable'
+
+cy.get('button').click({ force: true })
+
+info
+
+What's the difference?When you force an event to happen we will:
+
+- Continue to perform all default actions
+
+- Forcibly fire the event at the element
+
+We will NOT perform these:
+
+- Scroll the element into view
+
+- Ensure it is visible
+
+- Ensure it is not disabled
+
+- Ensure it is not detached
+
+- Ensure it is not readonly
+
+- Ensure it is not animating
+
+- Ensure it is not covered
+
+- Fire the event at a descendent
+
+In summary, { force: true } skips the checks, and it will always fire the
+event at the desired element.

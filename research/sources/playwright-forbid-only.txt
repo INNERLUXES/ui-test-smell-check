@@ -1,0 +1,17 @@
+Source: https://playwright.dev/docs/api/class-testconfig#test-config-forbid-only
+
+### forbidOnly
+
+Added in: v1.10
+testConfig.forbidOnly
+Whether to exit with an error if any tests or groups are marked as test.only() or test.describe.only(). Useful on CI.
+
+Usage
+
+playwright.config.ts
+
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  forbidOnly: !!process.env.CI,
+});

@@ -1,0 +1,63 @@
+ui-test-smell-check: examples/shop
+files: 10 files read, 9 with a UI test framework (Playwright 4, Cypress 2, Selenium 3), 1 without, 0 not read
+rules: 11 rules on; fail level error; configuration examples/config.json
+findings: 6 error, 26 warning, 2 info; 1 ignored by a comment with a reason
+
+examples/shop/cypress/e2e/account.cy.ts (Cypress)
+  1:23     WARNING  order-dependence   testIsolation: false keeps the state of the browser from one test to the next
+
+examples/shop/cypress/e2e/cart.cy.js (Cypress)
+  10:8     ERROR    fixed-wait         cy.wait(1500) waits a fixed 1,500 ms; wait for a condition the page shows instead
+  11:12    WARNING  styling-selector   cy.get ".cart-badge" picks the element by its class names
+  13:7     WARNING  shared-state       the test assigns cartId, a variable declared at the top of the file and shared by every test in it
+  17:6     ERROR    only-left          it.only leaves only the focused tests to run, and every other test is skipped
+  18:14    WARNING  absolute-url       cy.visit("http://localhost:8080/cart") opens a full address; set the base URL in the configuration and pass the path
+  19:12    WARNING  position-selector  cy.get "ul.cart-items li:nth-child(2) button" picks the element by its position: :nth-child(2)
+  19:60    WARNING  force-action       click({ force: true }) turns the actionability checks off
+
+examples/shop/playwright/checkout.spec.ts (Playwright)
+  17:24    WARNING  position-selector  locator "#checkout-form > div:nth-child(3) > button" picks the element by its position: :nth-child(3)
+  18:16    ERROR    fixed-wait         waitForTimeout(3000) waits a fixed 3,000 ms; wait for a condition the page shows instead
+  19:24    WARNING  styling-selector   locator ".css-1q2w3e4" uses the class css-1q2w3e4, a CSS-in-JS class name of the form css-<hash> (Emotion and others)
+  19:48    WARNING  force-action       click({ force: true }) turns the actionability checks off
+  20:5     WARNING  shared-state       the test assigns orderNumber, a variable declared at the top of the file and shared by every test in it
+  24:21    WARNING  absolute-url       goto("https://shop.example.test/account/orders") opens a full address; set the base URL in the configuration and pass the path
+  25:40    WARNING  nth-locator        .nth(1) picks one of several matching elements by its place
+  28:8     INFO     skipped-test       test.skip declares a test that is never run
+
+examples/shop/playwright/pages/cart-page.ts (Playwright)
+  10:35    WARNING  position-selector  locator "//ul[@id="cart-items"]/li[1]" picks the element by its position: [1]
+
+examples/shop/playwright/search.spec.ts (Playwright)
+  3:33     WARNING  order-dependence   test.describe.configure({ mode: 'serial' }) makes the tests run in order, each one after the one before
+  17:22    WARNING  styling-selector   locator ".filter-panel .price-range" picks the element by its class names
+
+examples/shop/selenium/CheckoutTest.java (Selenium)
+  14:2     WARNING  order-dependence   @TestMethodOrder fixes the order in which the tests of the class run
+  18:19    WARNING  position-selector  @FindBy(xpath) "//div[@class='summary']/span[3]" picks the element by its position: [3]
+  18:19    WARNING  styling-selector   @FindBy(xpath) "//div[@class='summary']/span[3]" tests the class attribute (@class)
+  26:12    ERROR    fixed-wait         Thread.sleep(1500) waits a fixed 1,500 ms; wait for a condition the page shows instead
+  33:37    WARNING  styling-selector   By.className "btn-primary" locates the element by a class name
+
+examples/shop/selenium/test_orders.py (Selenium)
+  15:12    WARNING  mixed-waits        implicitly_wait sets an implicit wait, and this file also uses an explicit wait (line 25)
+  23:35    WARNING  position-selector  By.XPATH "/html/body/div[2]/form/button" starts at the root of the document, so it follows every level of the page
+  24:10    ERROR    fixed-wait         time.sleep(2) waits a fixed 2,000 ms; wait for a condition the page shows instead
+  29:12    WARNING  shared-state       the test test_place_order assigns the module variable order_id through global, which every test in the file shares
+  30:40    WARNING  styling-selector   By.CLASS_NAME "css-9z8y7x6" uses the class css-9z8y7x6, a CSS-in-JS class name of the form css-<hash> (Emotion and others)
+  34:14    WARNING  order-dependence   pytest.mark.order makes this test depend on the order of the tests
+
+examples/shop/selenium/wishlist.test.mjs (Selenium)
+  11:27    WARNING  mixed-waits        setTimeouts sets an implicit wait, and this file also uses an explicit wait (line 21)
+  22:18    ERROR    fixed-wait         sleep(1000) waits a fixed 1,000 ms; wait for a condition the page shows instead
+  26:6     INFO     skipped-test       it.skip declares a test that is never run
+  27:39    WARNING  position-selector  By.xpath "(//button[@type="button"])[last()]" picks the element by its position: [last()]
+
+ignored by a comment:
+  examples/shop/playwright/search.spec.ts:16:14  fixed-wait  -- the panel slides in with a CSS transition that fires no event to wait for
+
+note: examples/shop/playwright/search.spec.ts:17:61: the ignore comment for styling-selector gives no reason; write one after -- (it is not applied)
+note: 1 file left out by the ignore patterns of the configuration: examples/shop/playwright/legacy/old-cart.spec.ts
+note: 1 file with no Playwright, Cypress or Selenium import was read and not checked: examples/shop/playwright/data/products.ts
+
+GATE: FAIL - 6 errors (--fail-on error)

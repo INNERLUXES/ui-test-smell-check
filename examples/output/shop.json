@@ -1,0 +1,992 @@
+{
+  "tool": "ui-test-smell-check",
+  "version": "1.0.0",
+  "inputs": [
+    "examples/shop"
+  ],
+  "config": "examples/config.json",
+  "failOn": "error",
+  "rules": [
+    {
+      "id": "fixed-wait",
+      "on": true,
+      "severity": "error",
+      "options": {
+        "minMs": 0
+      }
+    },
+    {
+      "id": "mixed-waits",
+      "on": true,
+      "severity": "warning",
+      "options": {}
+    },
+    {
+      "id": "position-selector",
+      "on": true,
+      "severity": "warning",
+      "options": {}
+    },
+    {
+      "id": "nth-locator",
+      "on": true,
+      "severity": "warning",
+      "options": {}
+    },
+    {
+      "id": "styling-selector",
+      "on": true,
+      "severity": "warning",
+      "options": {
+        "hashMinLength": 5
+      }
+    },
+    {
+      "id": "force-action",
+      "on": true,
+      "severity": "warning",
+      "options": {}
+    },
+    {
+      "id": "only-left",
+      "on": true,
+      "severity": "error",
+      "options": {}
+    },
+    {
+      "id": "skipped-test",
+      "on": true,
+      "severity": "info",
+      "options": {}
+    },
+    {
+      "id": "order-dependence",
+      "on": true,
+      "severity": "warning",
+      "options": {}
+    },
+    {
+      "id": "shared-state",
+      "on": true,
+      "severity": "warning",
+      "options": {}
+    },
+    {
+      "id": "absolute-url",
+      "on": true,
+      "severity": "warning",
+      "options": {}
+    }
+  ],
+  "totals": {
+    "files": 10,
+    "read": 10,
+    "notRead": 0,
+    "uiTestFiles": 9,
+    "noFramework": 1,
+    "leftOut": 1,
+    "byFramework": {
+      "playwright": 4,
+      "cypress": 2,
+      "selenium": 3
+    }
+  },
+  "files": [
+    {
+      "file": "examples/shop/cypress/e2e/account.cy.ts",
+      "language": "typescript",
+      "frameworks": [
+        "cypress"
+      ],
+      "findings": 1,
+      "ignored": 0
+    },
+    {
+      "file": "examples/shop/cypress/e2e/cart.cy.js",
+      "language": "javascript",
+      "frameworks": [
+        "cypress"
+      ],
+      "findings": 7,
+      "ignored": 0
+    },
+    {
+      "file": "examples/shop/playwright/checkout.spec.ts",
+      "language": "typescript",
+      "frameworks": [
+        "playwright"
+      ],
+      "findings": 8,
+      "ignored": 0
+    },
+    {
+      "file": "examples/shop/playwright/pages/cart-page.ts",
+      "language": "typescript",
+      "frameworks": [
+        "playwright"
+      ],
+      "findings": 1,
+      "ignored": 0
+    },
+    {
+      "file": "examples/shop/playwright/product.spec.ts",
+      "language": "typescript",
+      "frameworks": [
+        "playwright"
+      ],
+      "findings": 0,
+      "ignored": 0
+    },
+    {
+      "file": "examples/shop/playwright/search.spec.ts",
+      "language": "typescript",
+      "frameworks": [
+        "playwright"
+      ],
+      "findings": 2,
+      "ignored": 1
+    },
+    {
+      "file": "examples/shop/selenium/CheckoutTest.java",
+      "language": "java",
+      "frameworks": [
+        "selenium"
+      ],
+      "findings": 5,
+      "ignored": 0
+    },
+    {
+      "file": "examples/shop/selenium/test_orders.py",
+      "language": "python",
+      "frameworks": [
+        "selenium"
+      ],
+      "findings": 6,
+      "ignored": 0
+    },
+    {
+      "file": "examples/shop/selenium/wishlist.test.mjs",
+      "language": "javascript",
+      "frameworks": [
+        "selenium"
+      ],
+      "findings": 4,
+      "ignored": 0
+    }
+  ],
+  "findings": [
+    {
+      "file": "examples/shop/cypress/e2e/account.cy.ts",
+      "line": 1,
+      "column": 23,
+      "rule": "order-dependence",
+      "severity": "warning",
+      "framework": "cypress",
+      "message": "testIsolation: false keeps the state of the browser from one test to the next",
+      "code": "describe('account', { testIsolation: false }, () => {",
+      "basis": [
+        {
+          "key": "cyIndependent",
+          "text": "Best Practice: Tests should always be able to be run independently from one another and still pass.",
+          "section": "Having Tests Rely On The State Of Previous Tests",
+          "source": "https://docs.cypress.io/app/core-concepts/best-practices"
+        },
+        {
+          "key": "cyDependState",
+          "text": "Having tests that depend on the state of an earlier test can potentially cause nondeterministic test failures which make debugging challenging.",
+          "section": "Test Isolation",
+          "source": "https://docs.cypress.io/app/core-concepts/test-isolation"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/cypress/e2e/cart.cy.js",
+      "line": 10,
+      "column": 8,
+      "rule": "fixed-wait",
+      "severity": "error",
+      "framework": "cypress",
+      "message": "cy.wait(1500) waits a fixed 1,500 ms; wait for a condition the page shows instead",
+      "code": "cy.wait(1500);",
+      "basis": [
+        {
+          "key": "cyWaitAnti",
+          "text": "Anti-Pattern: Waiting for arbitrary time periods using cy.wait(Number).",
+          "section": "Unnecessary Waiting",
+          "source": "https://docs.cypress.io/app/core-concepts/best-practices"
+        },
+        {
+          "key": "cyWaitNever",
+          "text": "In Cypress, you almost never need to use cy.wait() for an arbitrary amount of time.",
+          "section": "Unnecessary Waiting",
+          "source": "https://docs.cypress.io/app/core-concepts/best-practices"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/cypress/e2e/cart.cy.js",
+      "line": 11,
+      "column": 12,
+      "rule": "styling-selector",
+      "severity": "warning",
+      "framework": "cypress",
+      "message": "cy.get \".cart-badge\" picks the element by its class names",
+      "code": "cy.get('.cart-badge').should('have.text', '1');",
+      "basis": [
+        {
+          "key": "cyVolatile",
+          "text": "Targeting the element above by tag, class or id is very volatile and highly subject to change.",
+          "section": "Selecting Elements",
+          "source": "https://docs.cypress.io/app/core-concepts/best-practices"
+        },
+        {
+          "key": "cySelectorBest",
+          "text": "Best Practice: Use data-* attributes to provide context to your selectors and isolate them from CSS or JS changes.",
+          "section": "Selecting Elements",
+          "source": "https://docs.cypress.io/app/core-concepts/best-practices"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/cypress/e2e/cart.cy.js",
+      "line": 13,
+      "column": 7,
+      "rule": "shared-state",
+      "severity": "warning",
+      "framework": "cypress",
+      "message": "the test assigns cartId, a variable declared at the top of the file and shared by every test in it",
+      "code": "cartId = text;",
+      "basis": [
+        {
+          "key": "cyQuietlyDepend",
+          "text": "Tests that quietly depend on each other are a leading cause of flaky suites: a test passes only because an earlier test left the browser in a particular state, and the moment you reorder, skip, or run them in isolation, things break.",
+          "section": "Test Isolation",
+          "source": "https://docs.cypress.io/app/core-concepts/writing-and-organizing-tests"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/cypress/e2e/cart.cy.js",
+      "line": 17,
+      "column": 6,
+      "rule": "only-left",
+      "severity": "error",
+      "framework": "cypress",
+      "message": "it.only leaves only the focused tests to run, and every other test is skipped",
+      "code": "it.only('removes a product from the cart', () => {",
+      "basis": [
+        {
+          "key": "cyOnly",
+          "text": "To run a specified suite or test, append .only to the function.",
+          "section": "Focusing and skipping tests",
+          "source": "https://docs.cypress.io/app/core-concepts/writing-and-organizing-tests"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/cypress/e2e/cart.cy.js",
+      "line": 18,
+      "column": 14,
+      "rule": "absolute-url",
+      "severity": "warning",
+      "framework": "cypress",
+      "message": "cy.visit(\"http://localhost:8080/cart\") opens a full address; set the base URL in the configuration and pass the path",
+      "code": "cy.visit('http://localhost:8080/cart');",
+      "basis": [
+        {
+          "key": "cyBaseUrlAnti",
+          "text": "Anti-Pattern: Using cy.visit() without setting a baseUrl.",
+          "section": "Setting a Global baseUrl",
+          "source": "https://docs.cypress.io/app/core-concepts/best-practices"
+        },
+        {
+          "key": "cyBaseUrlRemoves",
+          "text": "This removes the need to hard-code fully qualified domain name (FQDN) URLs in commands.",
+          "section": "Setting a Global baseUrl",
+          "source": "https://docs.cypress.io/app/core-concepts/best-practices"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/cypress/e2e/cart.cy.js",
+      "line": 19,
+      "column": 12,
+      "rule": "position-selector",
+      "severity": "warning",
+      "framework": "cypress",
+      "message": "cy.get \"ul.cart-items li:nth-child(2) button\" picks the element by its position: :nth-child(2)",
+      "code": "cy.get('ul.cart-items li:nth-child(2) button').click({ force: true });",
+      "basis": [
+        {
+          "key": "cySelectorAnti",
+          "text": "Anti-Pattern: Using highly brittle selectors that are subject to change.",
+          "section": "Selecting Elements",
+          "source": "https://docs.cypress.io/app/core-concepts/best-practices"
+        },
+        {
+          "key": "cySelectorBest",
+          "text": "Best Practice: Use data-* attributes to provide context to your selectors and isolate them from CSS or JS changes.",
+          "section": "Selecting Elements",
+          "source": "https://docs.cypress.io/app/core-concepts/best-practices"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/cypress/e2e/cart.cy.js",
+      "line": 19,
+      "column": 60,
+      "rule": "force-action",
+      "severity": "warning",
+      "framework": "cypress",
+      "message": "click({ force: true }) turns the actionability checks off",
+      "code": "cy.get('ul.cart-items li:nth-child(2) button').click({ force: true });",
+      "basis": [
+        {
+          "key": "cyForceSkips",
+          "text": "In summary, { force: true } skips the checks, and it will always fire the event at the desired element.",
+          "section": "Forcing",
+          "source": "https://docs.cypress.io/app/core-concepts/interacting-with-elements"
+        },
+        {
+          "key": "cyForcePass",
+          "text": "You can pass { force: true } to most action commands.",
+          "section": "Forcing",
+          "source": "https://docs.cypress.io/app/core-concepts/interacting-with-elements"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/playwright/checkout.spec.ts",
+      "line": 17,
+      "column": 24,
+      "rule": "position-selector",
+      "severity": "warning",
+      "framework": "playwright",
+      "message": "locator \"#checkout-form > div:nth-child(3) > button\" picks the element by its position: :nth-child(3)",
+      "code": "await page.locator('#checkout-form > div:nth-child(3) > button').click();",
+      "basis": [
+        {
+          "key": "pwTiedToDom",
+          "text": "XPath and CSS selectors can be tied to the DOM structure or implementation.",
+          "section": "Locate by CSS or XPath",
+          "source": "https://playwright.dev/docs/locators"
+        },
+        {
+          "key": "pwDomChange",
+          "text": "Your DOM can easily change so having your tests depend on your DOM structure can lead to failing tests.",
+          "section": "Prefer user-facing attributes to XPath or CSS selectors",
+          "source": "https://playwright.dev/docs/best-practices"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/playwright/checkout.spec.ts",
+      "line": 18,
+      "column": 16,
+      "rule": "fixed-wait",
+      "severity": "error",
+      "framework": "playwright",
+      "message": "waitForTimeout(3000) waits a fixed 3,000 ms; wait for a condition the page shows instead",
+      "code": "await page.waitForTimeout(3000);",
+      "basis": [
+        {
+          "key": "pwWaitFlaky",
+          "text": "Tests that wait for time are inherently flaky.",
+          "section": "waitForTimeout",
+          "source": "https://playwright.dev/docs/api/class-page#page-wait-for-timeout"
+        },
+        {
+          "key": "pwWaitNever",
+          "text": "Never wait for timeout in production.",
+          "section": "waitForTimeout",
+          "source": "https://playwright.dev/docs/api/class-page#page-wait-for-timeout"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/playwright/checkout.spec.ts",
+      "line": 19,
+      "column": 24,
+      "rule": "styling-selector",
+      "severity": "warning",
+      "framework": "playwright",
+      "message": "locator \".css-1q2w3e4\" uses the class css-1q2w3e4, a CSS-in-JS class name of the form css-<hash> (Emotion and others)",
+      "code": "await page.locator('.css-1q2w3e4').click({ force: true });",
+      "basis": [
+        {
+          "key": "pwClassChange",
+          "text": "Should the designer change something then the class might change, thus breaking your test.",
+          "section": "Prefer user-facing attributes to XPath or CSS selectors",
+          "source": "https://playwright.dev/docs/best-practices"
+        },
+        {
+          "key": "pwUserFacing",
+          "text": "To make tests resilient, we recommend prioritizing user-facing attributes and explicit contracts.",
+          "section": "Use locators",
+          "source": "https://playwright.dev/docs/best-practices"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/playwright/checkout.spec.ts",
+      "line": 19,
+      "column": 48,
+      "rule": "force-action",
+      "severity": "warning",
+      "framework": "playwright",
+      "message": "click({ force: true }) turns the actionability checks off",
+      "code": "await page.locator('.css-1q2w3e4').click({ force: true });",
+      "basis": [
+        {
+          "key": "pwForce",
+          "text": "Some actions like locator.click() support force option that disables non-essential actionability checks, for example passing truthy force to locator.click() method will not check that the target element actually receives click events.",
+          "section": "Forcing actions",
+          "source": "https://playwright.dev/docs/actionability"
+        },
+        {
+          "key": "pwAutoWaits",
+          "text": "It auto-waits for all the relevant checks to pass and only then performs the requested action.",
+          "section": "Introduction",
+          "source": "https://playwright.dev/docs/actionability"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/playwright/checkout.spec.ts",
+      "line": 20,
+      "column": 5,
+      "rule": "shared-state",
+      "severity": "warning",
+      "framework": "playwright",
+      "message": "the test assigns orderNumber, a variable declared at the top of the file and shared by every test in it",
+      "code": "orderNumber = await page.getByTestId('order-number').innerText();",
+      "basis": [
+        {
+          "key": "pwIsolation",
+          "text": "Test isolation improves reproducibility, makes debugging easier and prevents cascading test failures.",
+          "section": "Make tests as isolated as possible",
+          "source": "https://playwright.dev/docs/best-practices"
+        },
+        {
+          "key": "pwNoRelies",
+          "text": "This keeps your tests isolated as no test relies on another.",
+          "section": "Make tests as isolated as possible",
+          "source": "https://playwright.dev/docs/best-practices"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/playwright/checkout.spec.ts",
+      "line": 24,
+      "column": 21,
+      "rule": "absolute-url",
+      "severity": "warning",
+      "framework": "playwright",
+      "message": "goto(\"https://shop.example.test/account/orders\") opens a full address; set the base URL in the configuration and pass the path",
+      "code": "await page.goto('https://shop.example.test/account/orders');",
+      "basis": [
+        {
+          "key": "pwBaseUrl",
+          "text": "Base URL used for all pages in the context.",
+          "section": "Basic Options",
+          "source": "https://playwright.dev/docs/test-use-options#basic-options"
+        },
+        {
+          "key": "pwBaseUrlPath",
+          "text": "Allows navigating by using just the path, for example page.goto('/settings').",
+          "section": "Basic Options",
+          "source": "https://playwright.dev/docs/test-use-options#basic-options"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/playwright/checkout.spec.ts",
+      "line": 25,
+      "column": 40,
+      "rule": "nth-locator",
+      "severity": "warning",
+      "framework": "playwright",
+      "message": ".nth(1) picks one of several matching elements by its place",
+      "code": "await expect(page.getByRole('row').nth(1)).toContainText(orderNumber);",
+      "basis": [
+        {
+          "key": "pwNthNotRecommended",
+          "text": "These methods are not recommended because when your page changes, Playwright may click on an element you did not intend.",
+          "section": "Strictness",
+          "source": "https://playwright.dev/docs/locators"
+        },
+        {
+          "key": "pwNthCaution",
+          "text": "Often times, the page might change, and the locator will point to a completely different element from the one you expected.",
+          "section": "Get by nth item",
+          "source": "https://playwright.dev/docs/locators"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/playwright/checkout.spec.ts",
+      "line": 28,
+      "column": 8,
+      "rule": "skipped-test",
+      "severity": "info",
+      "framework": "playwright",
+      "message": "test.skip declares a test that is never run",
+      "code": "test.skip('prints the receipt', async ({ page }) => {",
+      "basis": [
+        {
+          "key": "pwSkippedNever",
+          "text": "Skipped tests are not supposed to be ever run.",
+          "section": "test.skip",
+          "source": "https://playwright.dev/docs/api/class-test"
+        },
+        {
+          "key": "pwSkippedGroup",
+          "text": "Tests in the skipped group are never run.",
+          "section": "test.describe.skip",
+          "source": "https://playwright.dev/docs/api/class-test"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/playwright/pages/cart-page.ts",
+      "line": 10,
+      "column": 35,
+      "rule": "position-selector",
+      "severity": "warning",
+      "framework": "playwright",
+      "message": "locator \"//ul[@id=\"cart-items\"]/li[1]\" picks the element by its position: [1]",
+      "code": "this.firstItem = page.locator('//ul[@id=\"cart-items\"]/li[1]');",
+      "basis": [
+        {
+          "key": "pwTiedToDom",
+          "text": "XPath and CSS selectors can be tied to the DOM structure or implementation.",
+          "section": "Locate by CSS or XPath",
+          "source": "https://playwright.dev/docs/locators"
+        },
+        {
+          "key": "pwDomChange",
+          "text": "Your DOM can easily change so having your tests depend on your DOM structure can lead to failing tests.",
+          "section": "Prefer user-facing attributes to XPath or CSS selectors",
+          "source": "https://playwright.dev/docs/best-practices"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/playwright/search.spec.ts",
+      "line": 3,
+      "column": 33,
+      "rule": "order-dependence",
+      "severity": "warning",
+      "framework": "playwright",
+      "message": "test.describe.configure({ mode: 'serial' }) makes the tests run in order, each one after the one before",
+      "code": "test.describe.configure({ mode: 'serial' });",
+      "basis": [
+        {
+          "key": "pwSerialNotRecommended",
+          "text": "Using serial is not recommended.",
+          "section": "Serial mode",
+          "source": "https://playwright.dev/docs/test-parallel#serial-mode"
+        },
+        {
+          "key": "pwSerialIsolated",
+          "text": "It is usually better to make your tests isolated, so they can be run independently.",
+          "section": "Serial mode",
+          "source": "https://playwright.dev/docs/test-parallel#serial-mode"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/playwright/search.spec.ts",
+      "line": 17,
+      "column": 22,
+      "rule": "styling-selector",
+      "severity": "warning",
+      "framework": "playwright",
+      "message": "locator \".filter-panel .price-range\" picks the element by its class names",
+      "code": "await page.locator('.filter-panel .price-range').click(); // ui-test-smell-check-ignore styling-selector",
+      "basis": [
+        {
+          "key": "pwClassChange",
+          "text": "Should the designer change something then the class might change, thus breaking your test.",
+          "section": "Prefer user-facing attributes to XPath or CSS selectors",
+          "source": "https://playwright.dev/docs/best-practices"
+        },
+        {
+          "key": "pwUserFacing",
+          "text": "To make tests resilient, we recommend prioritizing user-facing attributes and explicit contracts.",
+          "section": "Use locators",
+          "source": "https://playwright.dev/docs/best-practices"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/selenium/CheckoutTest.java",
+      "line": 14,
+      "column": 2,
+      "rule": "order-dependence",
+      "severity": "warning",
+      "framework": "selenium",
+      "message": "@TestMethodOrder fixes the order in which the tests of the class run",
+      "code": "@TestMethodOrder(MethodOrderer.OrderAnnotation.class)",
+      "basis": [
+        {
+          "key": "seAnyOrder",
+          "text": "Your tests should be able to run in any order, and not rely on other tests to complete in order to be successful.",
+          "section": "Test dependency",
+          "source": "https://www.selenium.dev/documentation/test_practices/discouraged/test_dependency/"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/selenium/CheckoutTest.java",
+      "line": 18,
+      "column": 19,
+      "rule": "position-selector",
+      "severity": "warning",
+      "framework": "selenium",
+      "message": "@FindBy(xpath) \"//div[@class='summary']/span[3]\" picks the element by its position: [3]",
+      "code": "@FindBy(xpath = \"//div[@class='summary']/span[3]\")",
+      "basis": [
+        {
+          "key": "seAbsoluteXpath",
+          "text": "The XPath could be absolute xpath, which is created from the root of the document.",
+          "section": "xpath",
+          "source": "https://www.selenium.dev/documentation/webdriver/elements/locators/"
+        },
+        {
+          "key": "pwTiedToDom",
+          "text": "XPath and CSS selectors can be tied to the DOM structure or implementation.",
+          "section": "Locate by CSS or XPath",
+          "source": "https://playwright.dev/docs/locators"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/selenium/CheckoutTest.java",
+      "line": 18,
+      "column": 19,
+      "rule": "styling-selector",
+      "severity": "warning",
+      "framework": "selenium",
+      "message": "@FindBy(xpath) \"//div[@class='summary']/span[3]\" tests the class attribute (@class)",
+      "code": "@FindBy(xpath = \"//div[@class='summary']/span[3]\")",
+      "basis": [
+        {
+          "key": "seIds",
+          "text": "In general, if HTML IDs are available, unique, and consistently predictable, they are the preferred method for locating an element on a page.",
+          "section": "Tips on working with locators",
+          "source": "https://www.selenium.dev/documentation/test_practices/encouraged/locators/"
+        },
+        {
+          "key": "seClassName",
+          "text": "Locates elements whose class name contains the search value (compound class names are not permitted)",
+          "section": "Traditional Locators",
+          "source": "https://www.selenium.dev/documentation/webdriver/elements/locators/"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/selenium/CheckoutTest.java",
+      "line": 26,
+      "column": 12,
+      "rule": "fixed-wait",
+      "severity": "error",
+      "framework": "selenium",
+      "message": "Thread.sleep(1500) waits a fixed 1,500 ms; wait for a condition the page shows instead",
+      "code": "Thread.sleep(1500);",
+      "basis": [
+        {
+          "key": "seSleep",
+          "text": "Because the code can't know exactly how long it needs to wait, this can fail when it doesn't sleep long enough.",
+          "section": "Waiting Strategies",
+          "source": "https://www.selenium.dev/documentation/webdriver/waits/"
+        },
+        {
+          "key": "seFlakyCause",
+          "text": "This is one of the primary causes of flaky tests.",
+          "section": "Waiting Strategies",
+          "source": "https://www.selenium.dev/documentation/webdriver/waits/"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/selenium/CheckoutTest.java",
+      "line": 33,
+      "column": 37,
+      "rule": "styling-selector",
+      "severity": "warning",
+      "framework": "selenium",
+      "message": "By.className \"btn-primary\" locates the element by a class name",
+      "code": "driver.findElement(By.className(\"btn-primary\")).click();",
+      "basis": [
+        {
+          "key": "seIds",
+          "text": "In general, if HTML IDs are available, unique, and consistently predictable, they are the preferred method for locating an element on a page.",
+          "section": "Tips on working with locators",
+          "source": "https://www.selenium.dev/documentation/test_practices/encouraged/locators/"
+        },
+        {
+          "key": "seClassName",
+          "text": "Locates elements whose class name contains the search value (compound class names are not permitted)",
+          "section": "Traditional Locators",
+          "source": "https://www.selenium.dev/documentation/webdriver/elements/locators/"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/selenium/test_orders.py",
+      "line": 15,
+      "column": 12,
+      "rule": "mixed-waits",
+      "severity": "warning",
+      "framework": "selenium",
+      "message": "implicitly_wait sets an implicit wait, and this file also uses an explicit wait (line 25)",
+      "code": "driver.implicitly_wait(5)",
+      "basis": [
+        {
+          "key": "seMix",
+          "text": "Do not mix implicit and explicit waits.",
+          "section": "Implicit waits",
+          "source": "https://www.selenium.dev/documentation/webdriver/waits/"
+        },
+        {
+          "key": "seUnpredictable",
+          "text": "Doing so can cause unpredictable wait times.",
+          "section": "Implicit waits",
+          "source": "https://www.selenium.dev/documentation/webdriver/waits/"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/selenium/test_orders.py",
+      "line": 23,
+      "column": 35,
+      "rule": "position-selector",
+      "severity": "warning",
+      "framework": "selenium",
+      "message": "By.XPATH \"/html/body/div[2]/form/button\" starts at the root of the document, so it follows every level of the page",
+      "code": "driver.find_element(By.XPATH, \"/html/body/div[2]/form/button\").click()",
+      "basis": [
+        {
+          "key": "seAbsoluteXpath",
+          "text": "The XPath could be absolute xpath, which is created from the root of the document.",
+          "section": "xpath",
+          "source": "https://www.selenium.dev/documentation/webdriver/elements/locators/"
+        },
+        {
+          "key": "pwTiedToDom",
+          "text": "XPath and CSS selectors can be tied to the DOM structure or implementation.",
+          "section": "Locate by CSS or XPath",
+          "source": "https://playwright.dev/docs/locators"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/selenium/test_orders.py",
+      "line": 24,
+      "column": 10,
+      "rule": "fixed-wait",
+      "severity": "error",
+      "framework": "selenium",
+      "message": "time.sleep(2) waits a fixed 2,000 ms; wait for a condition the page shows instead",
+      "code": "time.sleep(2)",
+      "basis": [
+        {
+          "key": "seSleep",
+          "text": "Because the code can't know exactly how long it needs to wait, this can fail when it doesn't sleep long enough.",
+          "section": "Waiting Strategies",
+          "source": "https://www.selenium.dev/documentation/webdriver/waits/"
+        },
+        {
+          "key": "seFlakyCause",
+          "text": "This is one of the primary causes of flaky tests.",
+          "section": "Waiting Strategies",
+          "source": "https://www.selenium.dev/documentation/webdriver/waits/"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/selenium/test_orders.py",
+      "line": 29,
+      "column": 12,
+      "rule": "shared-state",
+      "severity": "warning",
+      "framework": "selenium",
+      "message": "the test test_place_order assigns the module variable order_id through global, which every test in the file shares",
+      "code": "global order_id",
+      "basis": [
+        {
+          "key": "seIsolated",
+          "text": "We must ensure that the tests are isolated from one another.",
+          "section": "Avoid sharing state",
+          "source": "https://www.selenium.dev/documentation/test_practices/encouraged/avoid_sharing_state/"
+        },
+        {
+          "key": "seNoShare",
+          "text": "Do not share test data.",
+          "section": "Avoid sharing state",
+          "source": "https://www.selenium.dev/documentation/test_practices/encouraged/avoid_sharing_state/"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/selenium/test_orders.py",
+      "line": 30,
+      "column": 40,
+      "rule": "styling-selector",
+      "severity": "warning",
+      "framework": "selenium",
+      "message": "By.CLASS_NAME \"css-9z8y7x6\" uses the class css-9z8y7x6, a CSS-in-JS class name of the form css-<hash> (Emotion and others)",
+      "code": "driver.find_element(By.CLASS_NAME, \"css-9z8y7x6\").click()",
+      "basis": [
+        {
+          "key": "seIds",
+          "text": "In general, if HTML IDs are available, unique, and consistently predictable, they are the preferred method for locating an element on a page.",
+          "section": "Tips on working with locators",
+          "source": "https://www.selenium.dev/documentation/test_practices/encouraged/locators/"
+        },
+        {
+          "key": "seClassName",
+          "text": "Locates elements whose class name contains the search value (compound class names are not permitted)",
+          "section": "Traditional Locators",
+          "source": "https://www.selenium.dev/documentation/webdriver/elements/locators/"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/selenium/test_orders.py",
+      "line": 34,
+      "column": 14,
+      "rule": "order-dependence",
+      "severity": "warning",
+      "framework": "selenium",
+      "message": "pytest.mark.order makes this test depend on the order of the tests",
+      "code": "@pytest.mark.order(3)",
+      "basis": [
+        {
+          "key": "seAnyOrder",
+          "text": "Your tests should be able to run in any order, and not rely on other tests to complete in order to be successful.",
+          "section": "Test dependency",
+          "source": "https://www.selenium.dev/documentation/test_practices/discouraged/test_dependency/"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/selenium/wishlist.test.mjs",
+      "line": 11,
+      "column": 27,
+      "rule": "mixed-waits",
+      "severity": "warning",
+      "framework": "selenium",
+      "message": "setTimeouts sets an implicit wait, and this file also uses an explicit wait (line 21)",
+      "code": "await driver.manage().setTimeouts({ implicit: 4000 });",
+      "basis": [
+        {
+          "key": "seMix",
+          "text": "Do not mix implicit and explicit waits.",
+          "section": "Implicit waits",
+          "source": "https://www.selenium.dev/documentation/webdriver/waits/"
+        },
+        {
+          "key": "seUnpredictable",
+          "text": "Doing so can cause unpredictable wait times.",
+          "section": "Implicit waits",
+          "source": "https://www.selenium.dev/documentation/webdriver/waits/"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/selenium/wishlist.test.mjs",
+      "line": 22,
+      "column": 18,
+      "rule": "fixed-wait",
+      "severity": "error",
+      "framework": "selenium",
+      "message": "sleep(1000) waits a fixed 1,000 ms; wait for a condition the page shows instead",
+      "code": "await driver.sleep(1000);",
+      "basis": [
+        {
+          "key": "seSleep",
+          "text": "Because the code can't know exactly how long it needs to wait, this can fail when it doesn't sleep long enough.",
+          "section": "Waiting Strategies",
+          "source": "https://www.selenium.dev/documentation/webdriver/waits/"
+        },
+        {
+          "key": "seFlakyCause",
+          "text": "This is one of the primary causes of flaky tests.",
+          "section": "Waiting Strategies",
+          "source": "https://www.selenium.dev/documentation/webdriver/waits/"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/selenium/wishlist.test.mjs",
+      "line": 26,
+      "column": 6,
+      "rule": "skipped-test",
+      "severity": "info",
+      "framework": "selenium",
+      "message": "it.skip declares a test that is never run",
+      "code": "it.skip('shares the wishlist', async function () {",
+      "basis": [
+        {
+          "key": "cySkip",
+          "text": "To skip a specified suite or test, append .skip() to the function.",
+          "section": "Focusing and skipping tests",
+          "source": "https://docs.cypress.io/app/core-concepts/writing-and-organizing-tests"
+        }
+      ]
+    },
+    {
+      "file": "examples/shop/selenium/wishlist.test.mjs",
+      "line": 27,
+      "column": 39,
+      "rule": "position-selector",
+      "severity": "warning",
+      "framework": "selenium",
+      "message": "By.xpath \"(//button[@type=\"button\"])[last()]\" picks the element by its position: [last()]",
+      "code": "await driver.findElement(By.xpath('(//button[@type=\"button\"])[last()]')).click();",
+      "basis": [
+        {
+          "key": "seAbsoluteXpath",
+          "text": "The XPath could be absolute xpath, which is created from the root of the document.",
+          "section": "xpath",
+          "source": "https://www.selenium.dev/documentation/webdriver/elements/locators/"
+        },
+        {
+          "key": "pwTiedToDom",
+          "text": "XPath and CSS selectors can be tied to the DOM structure or implementation.",
+          "section": "Locate by CSS or XPath",
+          "source": "https://playwright.dev/docs/locators"
+        }
+      ]
+    }
+  ],
+  "ignored": [
+    {
+      "file": "examples/shop/playwright/search.spec.ts",
+      "line": 16,
+      "column": 14,
+      "rule": "fixed-wait",
+      "framework": "playwright",
+      "reason": "the panel slides in with a CSS transition that fires no event to wait for",
+      "commentLine": 15
+    }
+  ],
+  "unreadable": [],
+  "notes": [
+    "examples/shop/playwright/search.spec.ts:17:61: the ignore comment for styling-selector gives no reason; write one after -- (it is not applied)",
+    "1 file left out by the ignore patterns of the configuration: examples/shop/playwright/legacy/old-cart.spec.ts",
+    "1 file with no Playwright, Cypress or Selenium import was read and not checked: examples/shop/playwright/data/products.ts"
+  ],
+  "counts": {
+    "error": 6,
+    "warning": 26,
+    "info": 2
+  },
+  "gate": {
+    "failOn": "error",
+    "pass": false,
+    "reason": "6 errors"
+  }
+}

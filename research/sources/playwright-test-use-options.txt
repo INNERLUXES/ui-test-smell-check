@@ -1,0 +1,31 @@
+Source: https://playwright.dev/docs/test-use-options#basic-options
+
+# Configuration (use)
+
+## Introduction
+
+In addition to configuring the test runner you can also configure Emulation, Network and Recording for the Browser or BrowserContext. These options are passed to the use: {} object in the Playwright config.
+
+### Basic Options
+
+Set the base URL and storage state for all tests:
+
+playwright.config.ts
+
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    // Base URL to use in actions like `await page.goto('/')`.
+    baseURL: 'http://localhost:3000',
+
+    // Populates context with given storage state.
+    storageState: 'state.json',
+  },
+});
+
+Option | Description |
+
+testOptions.baseURL | Base URL used for all pages in the context. Allows navigating by using just the path, for example page.goto('/settings'). |
+
+testOptions.storageState | Populates context with given storage state. Useful for easy authentication, learn more. |

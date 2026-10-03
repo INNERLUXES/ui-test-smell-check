@@ -1,0 +1,43 @@
+Source: https://www.selenium.dev/documentation/webdriver/elements/locators/
+
+# Locator strategies
+
+Ways to identify one or more specific elements in the DOM.
+
+A locator is a way to identify elements on a page. It is the argument passed to the
+Finding element methods.
+
+Check out our encouraged test practices for tips on
+locators, including which to use when and
+why to declare locators separately from the finding methods.
+
+## Traditional Locators
+
+Selenium provides support for these 8 traditional location strategies in WebDriver:
+
+Locator | Description |
+
+class name | Locates elements whose class name contains the search value (compound class names are not permitted) |
+
+css selector | Locates elements matching a CSS selector |
+
+id | Locates elements whose ID attribute matches the search value |
+
+name | Locates elements whose NAME attribute matches the search value |
+
+link text | Locates anchor elements whose visible text matches the search value |
+
+partial link text | Locates anchor elements whose visible text contains the search value. If multiple elements are matching, only the first one will be selected. |
+
+tag name | Locates elements whose tag name matches the search value |
+
+xpath | Locates elements matching an XPath expression |
+
+## xpath
+
+A HTML document can be considered as a XML document, and then we can use xpath
+which will be the path traversed to reach the element of interest to locate the element.
+The XPath could be absolute xpath, which is created from the root of the document.
+Example - /html/form/input[1]. This will return the male radio button.
+Or the xpath could be relative. Example- //input[@name='fname']. This will return the
+first name text box. Let us create locator for female radio button using xpath.

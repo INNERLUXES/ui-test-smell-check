@@ -1,0 +1,27 @@
+Source: https://playwright.dev/docs/api/class-page#page-wait-for-timeout
+
+### waitForTimeout
+
+Added before v1.9
+page.waitForTimeout
+Discouraged
+
+Never wait for timeout in production. Tests that wait for time are inherently flaky. Use Locator actions and web assertions that wait automatically.
+
+Waits for the given timeout in milliseconds.
+
+Note that page.waitForTimeout() should only be used for debugging. Tests using the timer in production are going to be flaky. Use signals such as network events, selectors becoming visible and others instead.
+
+Usage
+
+// wait for 1 second
+await page.waitForTimeout(1000);
+
+Arguments
+
+-
+timeout number#
+
+A timeout to wait for
+
+Returns

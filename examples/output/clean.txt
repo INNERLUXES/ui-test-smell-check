@@ -1,0 +1,8 @@
+ui-test-smell-check: examples/shop/playwright/product.spec.ts
+files: 1 file read, 1 with a UI test framework (Playwright 1, Cypress 0, Selenium 0), 0 without, 0 not read
+rules: 11 rules on; fail level error
+findings: 0 error, 0 warning, 0 info
+
+no findings
+
+GATE: PASS (--fail-on error)

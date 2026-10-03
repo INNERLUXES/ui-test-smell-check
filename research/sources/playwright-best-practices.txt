@@ -1,0 +1,101 @@
+Source: https://playwright.dev/docs/best-practices
+
+# Best Practices
+
+## Introduction
+
+This guide should help you to make sure you are following our best practices and writing tests that are more resilient.
+
+## Testing philosophy
+
+### Test user-visible behavior
+
+Automated tests should verify that the application code works for the end users, and avoid relying on implementation details such as things which users will not typically use, see, or even know about such as the name of a function, whether something is an array, or the CSS class of some element. The end user will see or interact with what is rendered on the page, so your test should typically only see/interact with the same rendered output.
+
+### Make tests as isolated as possible
+
+Test isolation improves reproducibility, makes debugging easier and prevents cascading test failures.
+
+In order to avoid repetition for a particular part of your test you can use before and after hooks. Within your test file add a before hook to run a part of your test before each test such as going to a particular URL or logging in to a part of your app. This keeps your tests isolated as no test relies on another. However it is also ok to have a little duplication when tests are simple enough especially if it keeps your tests clearer and easier to read and maintain.
+
+import { test } from '@playwright/test';
+
+test.beforeEach(async ({ page }) => {
+  // Runs before each test and signs in each page.
+  await page.goto('https://github.com/login');
+  await page.getByLabel('Username or email address').fill('username');
+  await page.getByLabel('Password').fill('password');
+  await page.getByRole('button', { name: 'Sign in' }).click();
+});
+
+test('first', async ({ page }) => {
+  // page is signed in.
+});
+
+test('second', async ({ page }) => {
+  // page is signed in.
+});
+
+You can also reuse the signed-in state in the tests with setup project. That way you can log in only once and then skip the log in step for all of the tests.
+
+### Avoid testing third-party dependencies
+
+Only test what you control. Don't try to test links to external sites or third party servers that you do not control. Not only is it time consuming and can slow down your tests but also you cannot control the content of the page you are linking to, or if there are cookie banners or overlay pages or anything else that might cause your test to fail.
+
+Instead, use the Playwright Network API and guarantee the response needed.
+
+await page.route('**/api/fetch_data_third_party_dependency', route => route.fulfill({
+  status: 200,
+  body: testData,
+}));
+await page.goto('https://example.com');
+
+## Best Practices
+
+### Use locators
+
+In order to write end to end tests we need to first find elements on the webpage. We can do this by using Playwright's built in locators. Locators come with auto waiting and retry-ability. Auto waiting means that Playwright performs a range of actionability checks on the elements, such as ensuring the element is visible and enabled before it performs the click. To make tests resilient, we recommend prioritizing user-facing attributes and explicit contracts.
+
+page.getByRole('button', { name: 'submit' });
+
+#### Use chaining and filtering
+
+Locators can be chained to narrow down the search to a particular part of the page.
+
+const product = page.getByRole('listitem').filter({ hasText: 'Product 2' });
+
+You can also filter locators by text or by another locator.
+
+await page
+    .getByRole('listitem')
+    .filter({ hasText: 'Product 2' })
+    .getByRole('button', { name: 'Add to cart' })
+    .click();
+
+#### Prefer user-facing attributes to XPath or CSS selectors
+
+Your DOM can easily change so having your tests depend on your DOM structure can lead to failing tests. For example consider selecting this button by its CSS classes. Should the designer change something then the class might change, thus breaking your test.
+
+page.locator('button.buttonIcon.episode-actions-later');
+
+Use locators that are resilient to changes in the DOM.
+
+page.getByRole('button', { name: 'submit' });
+
+### Use web first assertions
+
+Assertions are a way to verify that the expected result and the actual result matched or not. By using web first assertions Playwright will wait until the expected condition is met. For example, when testing an alert message, a test would click a button that makes a message appear and check that the alert message is there. If the alert message takes half a second to appear, assertions such as toBeVisible() will wait and retry if needed.
+
+await expect(page.getByText('welcome')).toBeVisible();
+
+expect(await page.getByText('welcome').isVisible()).toBe(true);
+
+#### Don't use manual assertions
+
+Don't use manual assertions that are not awaiting the expect. In the code below the await is inside the expect rather than before it. When using assertions such as isVisible() the test won't wait a single second, it will just check the locator is there and return immediately.
+
+expect(await page.getByText('welcome').isVisible()).toBe(true);
+
+Use web first assertions such as toBeVisible() instead.
+
+await expect(page.getByText('welcome')).toBeVisible();

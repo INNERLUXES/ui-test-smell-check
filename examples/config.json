@@ -1,0 +1,10 @@
+{
+  "failOn": "error",
+  "rules": {
+    "nth-locator": "warning",
+    "absolute-url": { "severity": "warning" },
+    "fixed-wait": { "minMs": 0 },
+    "styling-selector": { "hashMinLength": 5 }
+  },
+  "ignore": ["examples/shop/playwright/legacy/**"]
+}

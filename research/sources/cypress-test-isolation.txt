@@ -1,0 +1,41 @@
+Source: https://docs.cypress.io/app/core-concepts/test-isolation
+
+# Test Isolation
+
+tip
+
+ Best Practice: Tests should
+always be able to be run independently from one another and still pass.
+
+As stated in our mission, we hold ourselves accountable to champion a testing
+process that actually works, and have built Cypress to guide developers towards
+writing independent tests from the start.
+
+We do this by cleaning up state before each test to ensure that the operation
+of one test does not affect another test later on. The goal for each test should
+be to reliably pass whether run in isolation or consecutively with other
+tests. Having tests that depend on the state of an earlier test can potentially
+cause nondeterministic test failures which make debugging challenging.
+
+Cypress will start each test with a clean test slate by restoring and clearing
+all:
+
+- aliases
+
+- clock mocks
+
+- intercepts
+
+- spies
+
+- stubs
+
+- viewport changes
+
+In addition to a clean test slate, Cypress also believes in running tests in a
+clean browser context such that the application or component under test behaves
+consistently when run. This behavior is described as testIsolation.
+
+The test isolation is a global configuration and can be overridden for
+end-to-end testing at the describe level with the
+testIsolation option.

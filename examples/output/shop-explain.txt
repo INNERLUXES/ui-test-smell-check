@@ -1,0 +1,160 @@
+ui-test-smell-check: examples/shop
+files: 10 files read, 9 with a UI test framework (Playwright 4, Cypress 2, Selenium 3), 1 without, 0 not read
+rules: 11 rules on; fail level error; configuration examples/config.json
+findings: 6 error, 26 warning, 2 info; 1 ignored by a comment with a reason
+
+examples/shop/cypress/e2e/account.cy.ts (Cypress)
+  1:23     WARNING  order-dependence   testIsolation: false keeps the state of the browser from one test to the next
+           code: describe('account', { testIsolation: false }, () => {
+           basis: "Best Practice: Tests should always be able to be run independently from one another and still pass." (Having Tests Rely On The State Of Previous Tests, https://docs.cypress.io/app/core-concepts/best-practices)
+           basis: "Having tests that depend on the state of an earlier test can potentially cause nondeterministic test failures which make debugging challenging." (Test Isolation, https://docs.cypress.io/app/core-concepts/test-isolation)
+
+examples/shop/cypress/e2e/cart.cy.js (Cypress)
+  10:8     ERROR    fixed-wait         cy.wait(1500) waits a fixed 1,500 ms; wait for a condition the page shows instead
+           code: cy.wait(1500);
+           basis: "Anti-Pattern: Waiting for arbitrary time periods using cy.wait(Number)." (Unnecessary Waiting, https://docs.cypress.io/app/core-concepts/best-practices)
+           basis: "In Cypress, you almost never need to use cy.wait() for an arbitrary amount of time." (Unnecessary Waiting, https://docs.cypress.io/app/core-concepts/best-practices)
+  11:12    WARNING  styling-selector   cy.get ".cart-badge" picks the element by its class names
+           code: cy.get('.cart-badge').should('have.text', '1');
+           basis: "Targeting the element above by tag, class or id is very volatile and highly subject to change." (Selecting Elements, https://docs.cypress.io/app/core-concepts/best-practices)
+           basis: "Best Practice: Use data-* attributes to provide context to your selectors and isolate them from CSS or JS changes." (Selecting Elements, https://docs.cypress.io/app/core-concepts/best-practices)
+  13:7     WARNING  shared-state       the test assigns cartId, a variable declared at the top of the file and shared by every test in it
+           code: cartId = text;
+           basis: "Tests that quietly depend on each other are a leading cause of flaky suites: a test passes only because an earlier test left the browser in a particular state, and the moment you reorder, skip, or run them in isolation, things break." (Test Isolation, https://docs.cypress.io/app/core-concepts/writing-and-organizing-tests)
+  17:6     ERROR    only-left          it.only leaves only the focused tests to run, and every other test is skipped
+           code: it.only('removes a product from the cart', () => {
+           basis: "To run a specified suite or test, append .only to the function." (Focusing and skipping tests, https://docs.cypress.io/app/core-concepts/writing-and-organizing-tests)
+  18:14    WARNING  absolute-url       cy.visit("http://localhost:8080/cart") opens a full address; set the base URL in the configuration and pass the path
+           code: cy.visit('http://localhost:8080/cart');
+           basis: "Anti-Pattern: Using cy.visit() without setting a baseUrl." (Setting a Global baseUrl, https://docs.cypress.io/app/core-concepts/best-practices)
+           basis: "This removes the need to hard-code fully qualified domain name (FQDN) URLs in commands." (Setting a Global baseUrl, https://docs.cypress.io/app/core-concepts/best-practices)
+  19:12    WARNING  position-selector  cy.get "ul.cart-items li:nth-child(2) button" picks the element by its position: :nth-child(2)
+           code: cy.get('ul.cart-items li:nth-child(2) button').click({ force: true });
+           basis: "Anti-Pattern: Using highly brittle selectors that are subject to change." (Selecting Elements, https://docs.cypress.io/app/core-concepts/best-practices)
+           basis: "Best Practice: Use data-* attributes to provide context to your selectors and isolate them from CSS or JS changes." (Selecting Elements, https://docs.cypress.io/app/core-concepts/best-practices)
+  19:60    WARNING  force-action       click({ force: true }) turns the actionability checks off
+           code: cy.get('ul.cart-items li:nth-child(2) button').click({ force: true });
+           basis: "In summary, { force: true } skips the checks, and it will always fire the event at the desired element." (Forcing, https://docs.cypress.io/app/core-concepts/interacting-with-elements)
+           basis: "You can pass { force: true } to most action commands." (Forcing, https://docs.cypress.io/app/core-concepts/interacting-with-elements)
+
+examples/shop/playwright/checkout.spec.ts (Playwright)
+  17:24    WARNING  position-selector  locator "#checkout-form > div:nth-child(3) > button" picks the element by its position: :nth-child(3)
+           code: await page.locator('#checkout-form > div:nth-child(3) > button').click();
+           basis: "XPath and CSS selectors can be tied to the DOM structure or implementation." (Locate by CSS or XPath, https://playwright.dev/docs/locators)
+           basis: "Your DOM can easily change so having your tests depend on your DOM structure can lead to failing tests." (Prefer user-facing attributes to XPath or CSS selectors, https://playwright.dev/docs/best-practices)
+  18:16    ERROR    fixed-wait         waitForTimeout(3000) waits a fixed 3,000 ms; wait for a condition the page shows instead
+           code: await page.waitForTimeout(3000);
+           basis: "Tests that wait for time are inherently flaky." (waitForTimeout, https://playwright.dev/docs/api/class-page#page-wait-for-timeout)
+           basis: "Never wait for timeout in production." (waitForTimeout, https://playwright.dev/docs/api/class-page#page-wait-for-timeout)
+  19:24    WARNING  styling-selector   locator ".css-1q2w3e4" uses the class css-1q2w3e4, a CSS-in-JS class name of the form css-<hash> (Emotion and others)
+           code: await page.locator('.css-1q2w3e4').click({ force: true });
+           basis: "Should the designer change something then the class might change, thus breaking your test." (Prefer user-facing attributes to XPath or CSS selectors, https://playwright.dev/docs/best-practices)
+           basis: "To make tests resilient, we recommend prioritizing user-facing attributes and explicit contracts." (Use locators, https://playwright.dev/docs/best-practices)
+  19:48    WARNING  force-action       click({ force: true }) turns the actionability checks off
+           code: await page.locator('.css-1q2w3e4').click({ force: true });
+           basis: "Some actions like locator.click() support force option that disables non-essential actionability checks, for example passing truthy force to locator.click() method will not check that the target element actually receives click events." (Forcing actions, https://playwright.dev/docs/actionability)
+           basis: "It auto-waits for all the relevant checks to pass and only then performs the requested action." (Introduction, https://playwright.dev/docs/actionability)
+  20:5     WARNING  shared-state       the test assigns orderNumber, a variable declared at the top of the file and shared by every test in it
+           code: orderNumber = await page.getByTestId('order-number').innerText();
+           basis: "Test isolation improves reproducibility, makes debugging easier and prevents cascading test failures." (Make tests as isolated as possible, https://playwright.dev/docs/best-practices)
+           basis: "This keeps your tests isolated as no test relies on another." (Make tests as isolated as possible, https://playwright.dev/docs/best-practices)
+  24:21    WARNING  absolute-url       goto("https://shop.example.test/account/orders") opens a full address; set the base URL in the configuration and pass the path
+           code: await page.goto('https://shop.example.test/account/orders');
+           basis: "Base URL used for all pages in the context." (Basic Options, https://playwright.dev/docs/test-use-options#basic-options)
+           basis: "Allows navigating by using just the path, for example page.goto('/settings')." (Basic Options, https://playwright.dev/docs/test-use-options#basic-options)
+  25:40    WARNING  nth-locator        .nth(1) picks one of several matching elements by its place
+           code: await expect(page.getByRole('row').nth(1)).toContainText(orderNumber);
+           basis: "These methods are not recommended because when your page changes, Playwright may click on an element you did not intend." (Strictness, https://playwright.dev/docs/locators)
+           basis: "Often times, the page might change, and the locator will point to a completely different element from the one you expected." (Get by nth item, https://playwright.dev/docs/locators)
+  28:8     INFO     skipped-test       test.skip declares a test that is never run
+           code: test.skip('prints the receipt', async ({ page }) => {
+           basis: "Skipped tests are not supposed to be ever run." (test.skip, https://playwright.dev/docs/api/class-test)
+           basis: "Tests in the skipped group are never run." (test.describe.skip, https://playwright.dev/docs/api/class-test)
+
+examples/shop/playwright/pages/cart-page.ts (Playwright)
+  10:35    WARNING  position-selector  locator "//ul[@id="cart-items"]/li[1]" picks the element by its position: [1]
+           code: this.firstItem = page.locator('//ul[@id="cart-items"]/li[1]');
+           basis: "XPath and CSS selectors can be tied to the DOM structure or implementation." (Locate by CSS or XPath, https://playwright.dev/docs/locators)
+           basis: "Your DOM can easily change so having your tests depend on your DOM structure can lead to failing tests." (Prefer user-facing attributes to XPath or CSS selectors, https://playwright.dev/docs/best-practices)
+
+examples/shop/playwright/search.spec.ts (Playwright)
+  3:33     WARNING  order-dependence   test.describe.configure({ mode: 'serial' }) makes the tests run in order, each one after the one before
+           code: test.describe.configure({ mode: 'serial' });
+           basis: "Using serial is not recommended." (Serial mode, https://playwright.dev/docs/test-parallel#serial-mode)
+           basis: "It is usually better to make your tests isolated, so they can be run independently." (Serial mode, https://playwright.dev/docs/test-parallel#serial-mode)
+  17:22    WARNING  styling-selector   locator ".filter-panel .price-range" picks the element by its class names
+           code: await page.locator('.filter-panel .price-range').click(); // ui-test-smell-check-ignore styling-selector
+           basis: "Should the designer change something then the class might change, thus breaking your test." (Prefer user-facing attributes to XPath or CSS selectors, https://playwright.dev/docs/best-practices)
+           basis: "To make tests resilient, we recommend prioritizing user-facing attributes and explicit contracts." (Use locators, https://playwright.dev/docs/best-practices)
+
+examples/shop/selenium/CheckoutTest.java (Selenium)
+  14:2     WARNING  order-dependence   @TestMethodOrder fixes the order in which the tests of the class run
+           code: @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+           basis: "Your tests should be able to run in any order, and not rely on other tests to complete in order to be successful." (Test dependency, https://www.selenium.dev/documentation/test_practices/discouraged/test_dependency/)
+  18:19    WARNING  position-selector  @FindBy(xpath) "//div[@class='summary']/span[3]" picks the element by its position: [3]
+           code: @FindBy(xpath = "//div[@class='summary']/span[3]")
+           basis: "The XPath could be absolute xpath, which is created from the root of the document." (xpath, https://www.selenium.dev/documentation/webdriver/elements/locators/)
+           basis: "XPath and CSS selectors can be tied to the DOM structure or implementation." (Locate by CSS or XPath, https://playwright.dev/docs/locators)
+  18:19    WARNING  styling-selector   @FindBy(xpath) "//div[@class='summary']/span[3]" tests the class attribute (@class)
+           code: @FindBy(xpath = "//div[@class='summary']/span[3]")
+           basis: "In general, if HTML IDs are available, unique, and consistently predictable, they are the preferred method for locating an element on a page." (Tips on working with locators, https://www.selenium.dev/documentation/test_practices/encouraged/locators/)
+           basis: "Locates elements whose class name contains the search value (compound class names are not permitted)" (Traditional Locators, https://www.selenium.dev/documentation/webdriver/elements/locators/)
+  26:12    ERROR    fixed-wait         Thread.sleep(1500) waits a fixed 1,500 ms; wait for a condition the page shows instead
+           code: Thread.sleep(1500);
+           basis: "Because the code can't know exactly how long it needs to wait, this can fail when it doesn't sleep long enough." (Waiting Strategies, https://www.selenium.dev/documentation/webdriver/waits/)
+           basis: "This is one of the primary causes of flaky tests." (Waiting Strategies, https://www.selenium.dev/documentation/webdriver/waits/)
+  33:37    WARNING  styling-selector   By.className "btn-primary" locates the element by a class name
+           code: driver.findElement(By.className("btn-primary")).click();
+           basis: "In general, if HTML IDs are available, unique, and consistently predictable, they are the preferred method for locating an element on a page." (Tips on working with locators, https://www.selenium.dev/documentation/test_practices/encouraged/locators/)
+           basis: "Locates elements whose class name contains the search value (compound class names are not permitted)" (Traditional Locators, https://www.selenium.dev/documentation/webdriver/elements/locators/)
+
+examples/shop/selenium/test_orders.py (Selenium)
+  15:12    WARNING  mixed-waits        implicitly_wait sets an implicit wait, and this file also uses an explicit wait (line 25)
+           code: driver.implicitly_wait(5)
+           basis: "Do not mix implicit and explicit waits." (Implicit waits, https://www.selenium.dev/documentation/webdriver/waits/)
+           basis: "Doing so can cause unpredictable wait times." (Implicit waits, https://www.selenium.dev/documentation/webdriver/waits/)
+  23:35    WARNING  position-selector  By.XPATH "/html/body/div[2]/form/button" starts at the root of the document, so it follows every level of the page
+           code: driver.find_element(By.XPATH, "/html/body/div[2]/form/button").click()
+           basis: "The XPath could be absolute xpath, which is created from the root of the document." (xpath, https://www.selenium.dev/documentation/webdriver/elements/locators/)
+           basis: "XPath and CSS selectors can be tied to the DOM structure or implementation." (Locate by CSS or XPath, https://playwright.dev/docs/locators)
+  24:10    ERROR    fixed-wait         time.sleep(2) waits a fixed 2,000 ms; wait for a condition the page shows instead
+           code: time.sleep(2)
+           basis: "Because the code can't know exactly how long it needs to wait, this can fail when it doesn't sleep long enough." (Waiting Strategies, https://www.selenium.dev/documentation/webdriver/waits/)
+           basis: "This is one of the primary causes of flaky tests." (Waiting Strategies, https://www.selenium.dev/documentation/webdriver/waits/)
+  29:12    WARNING  shared-state       the test test_place_order assigns the module variable order_id through global, which every test in the file shares
+           code: global order_id
+           basis: "We must ensure that the tests are isolated from one another." (Avoid sharing state, https://www.selenium.dev/documentation/test_practices/encouraged/avoid_sharing_state/)
+           basis: "Do not share test data." (Avoid sharing state, https://www.selenium.dev/documentation/test_practices/encouraged/avoid_sharing_state/)
+  30:40    WARNING  styling-selector   By.CLASS_NAME "css-9z8y7x6" uses the class css-9z8y7x6, a CSS-in-JS class name of the form css-<hash> (Emotion and others)
+           code: driver.find_element(By.CLASS_NAME, "css-9z8y7x6").click()
+           basis: "In general, if HTML IDs are available, unique, and consistently predictable, they are the preferred method for locating an element on a page." (Tips on working with locators, https://www.selenium.dev/documentation/test_practices/encouraged/locators/)
+           basis: "Locates elements whose class name contains the search value (compound class names are not permitted)" (Traditional Locators, https://www.selenium.dev/documentation/webdriver/elements/locators/)
+  34:14    WARNING  order-dependence   pytest.mark.order makes this test depend on the order of the tests
+           code: @pytest.mark.order(3)
+           basis: "Your tests should be able to run in any order, and not rely on other tests to complete in order to be successful." (Test dependency, https://www.selenium.dev/documentation/test_practices/discouraged/test_dependency/)
+
+examples/shop/selenium/wishlist.test.mjs (Selenium)
+  11:27    WARNING  mixed-waits        setTimeouts sets an implicit wait, and this file also uses an explicit wait (line 21)
+           code: await driver.manage().setTimeouts({ implicit: 4000 });
+           basis: "Do not mix implicit and explicit waits." (Implicit waits, https://www.selenium.dev/documentation/webdriver/waits/)
+           basis: "Doing so can cause unpredictable wait times." (Implicit waits, https://www.selenium.dev/documentation/webdriver/waits/)
+  22:18    ERROR    fixed-wait         sleep(1000) waits a fixed 1,000 ms; wait for a condition the page shows instead
+           code: await driver.sleep(1000);
+           basis: "Because the code can't know exactly how long it needs to wait, this can fail when it doesn't sleep long enough." (Waiting Strategies, https://www.selenium.dev/documentation/webdriver/waits/)
+           basis: "This is one of the primary causes of flaky tests." (Waiting Strategies, https://www.selenium.dev/documentation/webdriver/waits/)
+  26:6     INFO     skipped-test       it.skip declares a test that is never run
+           code: it.skip('shares the wishlist', async function () {
+           basis: "To skip a specified suite or test, append .skip() to the function." (Focusing and skipping tests, https://docs.cypress.io/app/core-concepts/writing-and-organizing-tests)
+  27:39    WARNING  position-selector  By.xpath "(//button[@type="button"])[last()]" picks the element by its position: [last()]
+           code: await driver.findElement(By.xpath('(//button[@type="button"])[last()]')).click();
+           basis: "The XPath could be absolute xpath, which is created from the root of the document." (xpath, https://www.selenium.dev/documentation/webdriver/elements/locators/)
+           basis: "XPath and CSS selectors can be tied to the DOM structure or implementation." (Locate by CSS or XPath, https://playwright.dev/docs/locators)
+
+ignored by a comment:
+  examples/shop/playwright/search.spec.ts:16:14  fixed-wait  -- the panel slides in with a CSS transition that fires no event to wait for
+
+note: examples/shop/playwright/search.spec.ts:17:61: the ignore comment for styling-selector gives no reason; write one after -- (it is not applied)
+note: 1 file left out by the ignore patterns of the configuration: examples/shop/playwright/legacy/old-cart.spec.ts
+note: 1 file with no Playwright, Cypress or Selenium import was read and not checked: examples/shop/playwright/data/products.ts
+
+GATE: FAIL - 6 errors (--fail-on error)

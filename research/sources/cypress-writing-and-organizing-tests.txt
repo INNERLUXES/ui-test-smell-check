@@ -1,0 +1,80 @@
+Source: https://docs.cypress.io/app/core-concepts/writing-and-organizing-tests
+
+### Focusing and skipping tests
+
+While developing, you rarely want to run the entire suite on every save.
+Cypress lets you focus on or skip specific tests so your feedback loop stays
+fast.
+
+To run a specified suite or test, append .only to the function. All nested
+suites will also be executed. This gives you the ability to run one test at a
+time and is the recommended way to write a test suite.
+
+describe('Account settings', () => {
+
+  // with .only, just this test runs and the other two are skipped
+
+  it.only('updates the email address', () => {
+
+    cy.get('[data-testid="email"]').clear().type('jane@example.test')
+
+    cy.get('[data-testid="save"]').click()
+
+    cy.contains('Profile updated').should('be.visible')
+
+  })
+
+  it('updates the display name', () => {
+
+    cy.get('[data-testid="profile-name"]').clear().type('Jane Lane')
+
+    cy.get('[data-testid="save"]').click()
+
+  })
+
+  it('uploads a new avatar', () => {
+
+    cy.get('[data-testid="avatar"]').selectFile('cypress/fixtures/avatar.png')
+
+  })
+
+})
+
+To skip a specified suite or test, append .skip() to the function. All nested
+suites will also be skipped.
+
+it.skip('uploads a new avatar', () => {
+
+  cy.get('[data-testid="avatar"]').selectFile('cypress/fixtures/avatar.png')
+
+})
+
+### Test Isolation
+
+tip
+
+ Best Practice: Tests should
+always be able to be run independently from one another and still pass.
+
+Tests that quietly depend on each other are a leading cause of flaky suites: a
+test passes only because an earlier test left the browser in a particular state,
+and the moment you reorder, skip, or run them in isolation, things break. As
+stated in our mission, we hold ourselves accountable to champion a testing
+process that actually works, and have built Cypress to guide developers toward
+writing independent tests from the start.
+
+We do this by cleaning up test state and the browser context before each test
+so the actions of one test can't affect another. The goal for each test is to
+reliably pass whether it runs in isolation or alongside others, which
+removes a whole category of nondeterministic failures that are painful to debug.
+
+The behavior of running tests in a clean browser context is called
+testIsolation.
+
+Test isolation is enabled by default (testIsolation: true) and applies
+only to end-to-end testing. It is a global configuration and can be overridden
+for end-to-end testing at the describe level with the
+testIsolation option.
+
+To learn more about this behavior and the trade-offs of disabling it, review our
+Test Isolation guide.
