@@ -1,0 +1,52 @@
+{
+  "name": "ui-test-smell-check",
+  "version": "1.0.0",
+  "description": "List the patterns that make UI tests flaky or brittle in Playwright, Cypress and Selenium WebDriver test files (JavaScript, TypeScript, Python and Java): fixed waits, selectors tied to position or to styling classes, forced actions, focused and skipped tests, tests that depend on their order or share state, mixed implicit and explicit waits and full addresses. Each finding has its file, line, column, rule, a one-line reason and the documentation page it rests on. The files are lexed as text and never run or imported. No dependencies.",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "bin": {
+    "ui-test-smell-check": "bin/ui-test-smell-check.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "docs",
+    "examples",
+    "research",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test \"test/*.test.js\"",
+    "test:coverage": "node --test --experimental-test-coverage \"test/*.test.js\"",
+    "check": "node tools/check.mjs",
+    "example": "node tools/example.mjs"
+  },
+  "keywords": [
+    "playwright",
+    "cypress",
+    "selenium",
+    "webdriver",
+    "flaky-tests",
+    "test-smells",
+    "e2e",
+    "ui-testing",
+    "test-automation",
+    "lint",
+    "qa",
+    "cli"
+  ],
+  "author": "INNERLUXES <info@innerluxes.dev>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/INNERLUXES/ui-test-smell-check.git"
+  },
+  "homepage": "https://innerluxes.dev/software-testing/automation"
+}
